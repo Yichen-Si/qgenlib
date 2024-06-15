@@ -39,17 +39,19 @@
 #include <vector>
 #include <map>
 #include <queue>
+#include <cctype>
 
 /**
  * Splits a line into a vector - PERL style
  */
-void split(std::vector<std::string>& vec, const char* delims, std::string& str, uint32_t limit=UINT_MAX, bool clear=true, bool collapse=true);
+void split(std::vector<std::string>& vec, const char* delims, std::string& str, uint32_t limit=UINT_MAX, bool clear=true, bool collapse=true, bool strip=false);
 
 /**
  * Splits a line into a vector - PERL style
  */
-void split(std::vector<std::string>& vec, const char* delims, const char* str, uint32_t limit=UINT_MAX, bool clear=true, bool collapse=true);
+void split(std::vector<std::string>& vec, const char* delims, const char* str, uint32_t limit=UINT_MAX, bool clear=true, bool collapse=true, bool strip=false);
 
+bool stripstr(const std::string& str, std::string& substr);
 
 /**
  * Casts a string into int32.  Returns true if successful.

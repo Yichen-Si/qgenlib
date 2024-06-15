@@ -31,7 +31,7 @@ int param::statusCol = 15;
 int param::helpCol = 20;
 
 // constructor -- assign initial values
-param::param(char c, const char * desc, void * v, const char* help) 
+param::param(char c, const char * desc, void * v, const char* help)
   : ch((char)tolower(c)),
     description(desc == NULL ? "" : desc),
     var(v),
@@ -93,17 +93,17 @@ longParams::longParams(const char * desc, longParamList * lst)
 
   longParamList * ptr = list + 1;  // first parameter
 
-  while (ptr->desc != NULL) {  // unless it is non-informative 
+  while (ptr->desc != NULL) {  // unless it is non-informative
     if (ptr->value != NULL) {  // if it is a real parameter
       index[ptr->desc] = ptr;  // map string to param
       int tmp = strlen(ptr->desc);   // if it is just a group
-      if (tmp > name_len) name_len = tmp; // modify group_len      
+      if (tmp > name_len) name_len = tmp; // modify group_len
     }
     else {
       int tmp = strlen(ptr->desc);   // if it is just a group
       if (tmp > group_len) group_len = tmp; // modify group_len
     }
-    
+
     ptr++;
   }
 
@@ -148,7 +148,7 @@ int longParams::TranslateExtras(const char * cstr, const char * extras)
       else if ( ptr->touched )         error("[E:%s:%d %s] Redundant use of option --%s is not allowed",__FILE__,__LINE__,__FUNCTION__,cstr);
       else {
 	*(double *) ptr->value = atof(extras);
-	ptr->touched = true;      
+	ptr->touched = true;
       }
       return 1;
     case LP_STRING_PARAM:
@@ -156,25 +156,25 @@ int longParams::TranslateExtras(const char * cstr, const char * extras)
       else if ( ptr->touched )         error("[E:%s:%d %s] Redundant use of option --%s is not allowed",__FILE__,__LINE__,__FUNCTION__,cstr);
       else {
 	*(std::string *) ptr->value = extras;
-	ptr->touched = true;      
+	ptr->touched = true;
       }
       return 1;
     case LP_MULTI_INT_PARAM:
       if ( !CheckInteger(extras) ) error("[E:%s:%d %s] Invalid argument --%s %s. Integer was expected",__FILE__,__LINE__,__FUNCTION__, cstr, extras);
       else
 	((std::vector<int> *) ptr->value)->push_back(atoi(extras));
-      return 1;
+      return 2;
     case LP_MULTI_DOUBLE_PARAM:
       if ( !CheckDouble(extras) ) error("[E:%s:%d %s] Invalid argument --%s %s. Double was expected",__FILE__,__LINE__,__FUNCTION__, cstr, extras);
-      else 
+      else
 	((std::vector<double> *) ptr->value)->push_back(atof(extras));
-      return 1;
+      return 2;
     case LP_MULTI_STRING_PARAM:
-      if ( extras == NULL ) 
+      if ( extras == NULL )
 	error("[E:%s:%d %s] Invalid argument --%s %s. String was expected",__FILE__,__LINE__,__FUNCTION__, cstr, extras);
-      else 
+      else
       ((std::vector<std::string> *) ptr->value)->push_back(extras);
-      return 1;
+      return 2;
     default:
       return -1; // ignore?
     }
@@ -191,12 +191,12 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
   int line_start = group_len ? group_len + 5 : 0;
   int i;
 
-  if (ptr->value == NULL) {  // if group parameter, end previous group (if exists) 
+  if (ptr->value == NULL) {  // if group parameter, end previous group (if exists)
     fprintf(stderr, "%s %*s :", need_a_comma ? "\n" : "", group_len + 2, ptr->desc);
     need_a_comma = false;
     line_len = line_start;
   }
-  else {                     // otherwise, print argument name and 
+  else {                     // otherwise, print argument name and
     switch(ptr->type) {
     case LP_BOOL_PARAM:
       state = * (bool *) ptr->value ? " [ON]" : "";
@@ -210,7 +210,7 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
     case LP_DOUBLE_PARAM:
       if (* (double *) ptr->value != _NAN_) {
 	  double value = * (double *) ptr->value;
-	  
+
 	  state = " [";
 	  if (value == 0.0 || value >= 0.01)
 	    catprintf(state, "%.*f", precision, value);
@@ -222,7 +222,7 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
 	state = "";
       break;
     case LP_STRING_PARAM:
-      if ( ((std::string*) ptr->value)->empty() ) 
+      if ( ((std::string*) ptr->value)->empty() )
 	state = "";
       else
 	state = " [" + * (std::string *) ptr->value + "]";
@@ -230,12 +230,12 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
     case LP_MULTI_INT_PARAM:
       {
 	std::vector<int>* v = (std::vector<int>*) ptr->value;
-	if ( v->empty() ) 
+	if ( v->empty() )
 	  state = "";
 	else {
 	  state = " [";
 	  for(i=0; i < (int)v->size(); ++i) {
-	    if ( i > 0 ) 
+	    if ( i > 0 )
 	      catprintf(state, ", %d", v->at(i));
 	    else
 	      catprintf(state, "%d", v->at(i));
@@ -247,14 +247,14 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
     case LP_MULTI_DOUBLE_PARAM:
       {
 	std::vector<double>* v = (std::vector<double>*) ptr->value;
-	if ( v->empty() ) 
+	if ( v->empty() )
 	  state = "";
 	else {
 	  state = " [";
 	  for(i=0; i < (int)v->size(); ++i) {
-	    if ( i > 0 ) 
+	    if ( i > 0 )
 	      state += ", ";
-	    
+
 	    if (v->at(i) == 0.0 || v->at(i) >= 0.01)
 	      catprintf(state, "%.*f", precision, v->at(i));
 	    else
@@ -267,12 +267,12 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
     case LP_MULTI_STRING_PARAM:
       {
 	std::vector<std::string>* v = (std::vector<std::string>*) ptr->value;
-	if ( v->empty() ) 
+	if ( v->empty() )
 	  state = "";
 	else {
 	  state = " [";
 	  for(i=0; i < (int)v->size(); ++i) {
-	    if ( i > 0 ) 
+	    if ( i > 0 )
 	      state += ", ";
 	    state += v->at(i);
 	  }
@@ -283,9 +283,9 @@ void longParams::Status(longParamList * ptr, int & line_len, bool & need_a_comma
     default:
       error("[E:%s:%d %s] Cannot recognize the parameter type %d",__FILE__,__LINE__,__FUNCTION__,ptr->type);
     }
-    
+
     int item_len = 3 + strlen(ptr->desc) + need_a_comma + state.size();
-    
+
     if (item_len + line_len > 78 && line_len > line_start)
 	{
 	  line_len = line_start;
@@ -308,10 +308,10 @@ void longParams::HelpMessage(longParamList * ptr)
   std::string state;
   int i;
 
-  if (ptr->value == NULL) {  // if group parameter, end previous group (if exists) 
+  if (ptr->value == NULL) {  // if group parameter, end previous group (if exists)
     fprintf(stderr, "\n== %s%s%s ==\n", ptr->desc, ptr->help ? " - " : "", ptr->help ? ptr->help : "");
   }
-  else {                     // otherwise, print argument name and 
+  else {                     // otherwise, print argument name and
     switch(ptr->type) {
     case LP_BOOL_PARAM:
       state = * (bool *) ptr->value ? " [FLG: ON]" : " [FLG: OFF]";
@@ -325,7 +325,7 @@ void longParams::HelpMessage(longParamList * ptr)
     case LP_DOUBLE_PARAM:
       if (* (double *) ptr->value != _NAN_) {
 	  double value = * (double *) ptr->value;
-	  
+
 	  state = " [FLT: ";
 	  if (value == 0.0 || value >= 0.01)
 	    catprintf(state, "%.*f", precision, value);
@@ -337,7 +337,7 @@ void longParams::HelpMessage(longParamList * ptr)
 	state = " [FLT: NaN]";
       break;
     case LP_STRING_PARAM:
-      if ( ((std::string*) ptr->value)->empty() ) 
+      if ( ((std::string*) ptr->value)->empty() )
 	state = " [STR: ]";
       else
 	state = " [STR: " + * (std::string *) ptr->value + "]";
@@ -345,12 +345,12 @@ void longParams::HelpMessage(longParamList * ptr)
     case LP_MULTI_INT_PARAM:
       {
 	std::vector<int>* v = (std::vector<int>*) ptr->value;
-	if ( v->empty() ) 
+	if ( v->empty() )
 	  state = " [V_INT: ]";
 	else {
 	  state = " [V_INT: ";
 	  for(i=0; i < (int)v->size(); ++i) {
-	    if ( i > 0 ) 
+	    if ( i > 0 )
 	      catprintf(state, ", %d", v->at(i));
 	    else
 	      catprintf(state, "%d", v->at(i));
@@ -362,14 +362,14 @@ void longParams::HelpMessage(longParamList * ptr)
     case LP_MULTI_DOUBLE_PARAM:
       {
 	std::vector<double>* v = (std::vector<double>*) ptr->value;
-	if ( v->empty() ) 
+	if ( v->empty() )
 	  state = " [V_FLT: ]";
 	else {
 	  state = " [V_FLT: ";
 	  for(i=0; i < (int)v->size(); ++i) {
-	    if ( i > 0 ) 
+	    if ( i > 0 )
 	      state += ", ";
-	    
+
 	    if (v->at(i) == 0.0 || v->at(i) >= 0.01)
 	      catprintf(state, "%.*f", precision, v->at(i));
 	    else
@@ -382,12 +382,12 @@ void longParams::HelpMessage(longParamList * ptr)
     case LP_MULTI_STRING_PARAM:
       {
 	std::vector<std::string>* v = (std::vector<std::string>*) ptr->value;
-	if ( v->empty() ) 
+	if ( v->empty() )
 	  state = " [V_STR: ]";
 	else {
 	  state = " [V_STR: ";
 	  for(i=0; i < (int)v->size(); ++i) {
-	    if ( i > 0 ) 
+	    if ( i > 0 )
 	      state += ", ";
 	    state += v->at(i);
 	  }
@@ -398,7 +398,7 @@ void longParams::HelpMessage(longParamList * ptr)
     default:
       error("[E:%s:%d %s] Cannot recognize the parameter type %d",__FILE__,__LINE__,__FUNCTION__,ptr->type);
     }
-    
+
 
     fprintf(stderr, "   --%-*s%-*s%s%s%s\n", name_len, ptr->desc, param::helpCol, state.c_str(), " : ", ptr->help ? ptr->help : "", ptr->exclusive ? (ptr->help ? " (EXCLUSIVE PARAMETER)" : "(EXCLUSIVE PARAMETER)") : "");
   }
@@ -408,11 +408,11 @@ void longParams::HelpMessage(longParamList * ptr)
 void longParams::HelpMessage()
 {
   if (!description.empty() && description[0] != 0)  // group option
-    fprintf(stderr, "\n%s:\n", description.c_str());    
+    fprintf(stderr, "\n%s:\n", description.c_str());
     //fprintf(stderr, "\n%s - %s\n", description.c_str(), helpstring.c_str());
 
   // for the rest of the group, print parameters
-  for (longParamList * ptr = list + 1; ptr->desc != NULL; ptr++)  
+  for (longParamList * ptr = list + 1; ptr->desc != NULL; ptr++)
     HelpMessage(ptr);
 
   fprintf(stderr, "\n");
@@ -431,7 +431,7 @@ void longParams::Status()
   int  line_len = 0;
 
   // for the rest of the group, print parameters
-  for (longParamList * ptr = list + 1; ptr->desc != NULL; ptr++)  
+  for (longParamList * ptr = list + 1; ptr->desc != NULL; ptr++)
     Status(ptr, line_len, need_a_comma);
 
   fprintf(stderr, "\n");
@@ -449,6 +449,8 @@ void paramList::Add(param * p)
 void paramList::Read(int argc, char ** argv, int start)
 {
   int i, j;
+  char* key = NULL;
+  bool multi_open = false;
   // iterate from first argument
   for (i=start; i < argc; i++) {
     bool success = false;
@@ -456,7 +458,7 @@ void paramList::Read(int argc, char ** argv, int start)
     if (argv[i][0] == '-' && argv[i][1]) { // first is -, second is non-null
       if ( ( argv[i][1] == 'h' ) || ( strcmp(argv[i],"--help") == 0 ) ) { // printing help requested
 	HelpMessage();
-	if ( messages.empty() ) 
+	if ( messages.empty() )
 	  fprintf(stderr,"NOTES:\n");
 	fprintf(stderr, "When --help was included in the argument. The program prints the help message but do not actually run\n");
 	exit(1);
@@ -465,11 +467,14 @@ void paramList::Read(int argc, char ** argv, int start)
       for (j=0; j<(int)pl.size(); j++) {      // compare with all available parameters
 	success = tolower(argv[i][1]) == pl[j]->ch;  // option should match
 	if (success) {
+    key = argv[i];
+    multi_open = false;
 	  // see if it can be parsed using two consecutive arguments
 	  //if ((i+1 < argc) && pl[j]->TranslateExtras(argv[i]+2, argv[i+1]))
 	  int ret = pl[j]->TranslateExtras(argv[i]+2, argv[i+1]);
 	  if ( ret >= 0 ) {
-	    if ( ret == 1 ) i++;
+	    if ( ret >= 1 ) i++;
+      if ( ret == 2 ) multi_open = true;
 	    break;
 	  }
 	}
@@ -477,6 +482,14 @@ void paramList::Read(int argc, char ** argv, int start)
 
       if ( j == (int)pl.size() ) {
 	catprintf(errors, "Command line parameter %s (#%d) not recognized\n", argv[i], i);
+  key = NULL;
+  multi_open = false;
+      }
+    }
+    else if (key != NULL && multi_open) {
+      int ret = pl[j]->TranslateExtras(key+2, argv[i]);
+      if (ret != 2) {
+        catprintf(errors, "Cannot correspond command line parameter %s (#%d) to any of the options\n", argv[i], i);
       }
     }
     else {
@@ -556,7 +569,7 @@ void paramList::Status()
   for (int i=0; i<(int)pl.size(); i++)
     pl[i]->Status();
 
-  fprintf(stderr, "\nRun with --help for more detailed help messages of each argument.\n");  
+  fprintf(stderr, "\nRun with --help for more detailed help messages of each argument.\n");
   fprintf(stderr, "\n");
 
   if (errors.size())

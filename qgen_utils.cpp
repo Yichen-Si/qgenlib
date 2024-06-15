@@ -26,7 +26,7 @@
 /**
  * Splits a line into a vector - PERL style
  */
-void split(std::vector<std::string>& vec, const char *delims, std::string& str, uint32_t limit, bool clear, bool collapse)
+void split(std::vector<std::string>& vec, const char *delims, std::string& str, uint32_t limit, bool clear, bool collapse, bool strip)
 {
     std::map<char, int32_t> delim_set;
 
@@ -60,8 +60,16 @@ void split(std::vector<std::string>& vec, const char *delims, std::string& str, 
         {
             if (collapse && token.str()!="")
             {
-                vec.push_back(token.str());
-                ++noTokens;
+                if (strip) {
+                    std::string substr;
+                    if (stripstr(token.str(), substr)) {
+                        vec.push_back(substr);
+                        ++noTokens;
+                    }
+                } else {
+                    vec.push_back(token.str());
+                    ++noTokens;
+                }
                 token.str("");
             }
         }
@@ -73,7 +81,7 @@ void split(std::vector<std::string>& vec, const char *delims, std::string& str, 
 /**
  * Splits a line into a vector - PERL style
  */
-void split(std::vector<std::string>& vec, const char *delims, const char* str, uint32_t limit, bool clear, bool collapse)
+void split(std::vector<std::string>& vec, const char *delims, const char* str, uint32_t limit, bool clear, bool collapse, bool strip)
 {
     std::map<char, int32_t> delim_set;
 
@@ -107,14 +115,37 @@ void split(std::vector<std::string>& vec, const char *delims, const char* str, u
         {
             if (collapse && token.str()!="")
             {
-                vec.push_back(token.str());
-                ++noTokens;
+                if (strip) {
+                    std::string substr;
+                    if (stripstr(token.str(), substr)) {
+                        vec.push_back(substr);
+                        ++noTokens;
+                    }
+                } else {
+                    vec.push_back(token.str());
+                    ++noTokens;
+                }
                 token.str("");
             }
         }
 
         ++i;
     }
+};
+
+bool stripstr(const std::string& str, std::string& substr) {
+    size_t start = str.find_first_not_of(" \t\n");
+    if (start != std::string::npos) {
+        substr = str.substr(start);
+    }
+    size_t end = str.find_last_not_of(" \t\n");
+    if (end != std::string::npos) {
+        substr = substr.substr(0, end + 1);
+    }
+    if (substr.empty()) {
+        return false;
+    }
+    return true;
 };
 
 /**
@@ -179,7 +210,7 @@ bool str2intervals(std::vector<uint64_t>& begs, std::vector<uint64_t>& ends, con
     if ( intervals.size() != 2 )
       return false;
     begs.push_back(strtoull(intervals[0].c_str(), NULL, 10));
-    ends.push_back(strtoull(intervals[1].c_str(), NULL, 10));    
+    ends.push_back(strtoull(intervals[1].c_str(), NULL, 10));
   }
   return true;
 }
