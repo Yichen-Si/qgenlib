@@ -29,6 +29,16 @@ typedef std::map<std::string,void*>::iterator StringMapIterator;
 
 class commandList;  // list of commands
 
+class commandHelper {
+public:
+  std::string copyright_str;
+  std::string license_str;
+  
+  commandHelper();
+};
+
+extern commandHelper commandHelp;
+
 // contents for long command list
 struct longCommandList
 {

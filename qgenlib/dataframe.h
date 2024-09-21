@@ -48,7 +48,8 @@ public:
   }
 
   inline int32_t get_colidx(const char* colname) {
-    return col2idx[colname];
+    if ( has_column(colname) ) return col2idx[colname];
+    else return -1;
   }
 
   inline const std::string& get_str_elem(int32_t row, const char* colname) {

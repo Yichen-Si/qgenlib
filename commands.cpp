@@ -1,20 +1,3 @@
-/*
- *  Copyright (C) 2010  Regents of the University of Michigan
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "qgenlib/commands.h"
 #include "qgenlib/qgen_constant.h"
 #include "qgenlib/qgen_error.h"
@@ -26,11 +9,18 @@
 #include <ctype.h>
 #include <stdarg.h>
 
+#define CONSOLE_WIDTH 80
+
 int command::nameCol = 30;
 int command::statusCol = 15;
 int command::helpCol = 20;
 
-#define CONSOLE_WIDTH 80
+commandHelper commandHelp;
+
+commandHelper::commandHelper() {
+  copyright_str.assign("Copyright (c) 2009-2024 by Hyun Min Kang and Adrian Tan");
+  license_str.assign("Licensed under the Apache License v2.0 http://www.apache.org/licenses/");
+}
 
 // constructor -- assign initial values
 command::command(const char * desc, int (*f)(int, char**), const char* help) :
@@ -188,8 +178,8 @@ int commandList::Read(int argc, char ** argv, int start)
       //notice("%s %x %s", cmd.c_str(), ptr->func, ptr->desc);            
       if ( ( cmd == ptr->desc ) && ( ptr->func != NULL ) ) {
         fprintf(stderr, "[%s %s] -- %s\n\n", argv[0], ptr->desc, ptr->help);
-        fprintf(stderr, " Copyright (c) 2009-2022 by Hyun Min Kang and Adrian Tan\n");
-        fprintf(stderr, " Licensed under the Apache License v2.0 http://www.apache.org/licenses/\n");
+	fprintf(stderr, " %s\n", commandHelp.copyright_str.c_str());
+	fprintf(stderr, " %s\n", commandHelp.license_str.c_str());
         return ptr->func(argc-start, argv+start);
       }
     }
