@@ -33,6 +33,7 @@
 #include <vector>
 #include <cstdlib>
 #include <climits>
+#include <cstdint>
 #include <cstring>
 #include <cmath>
 #include <cfloat>

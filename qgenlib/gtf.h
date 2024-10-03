@@ -26,6 +26,7 @@
 #include <vector>
 #include <cstring>
 #include <climits>
+#include <cstdint>
 #include "qgen_error.h"
 #include "gtf_interval_tree.h"
 #include "pos_loci.h"
@@ -46,7 +47,7 @@
 //   // returns true iff this < l
 //   inline bool operator< (const posLocus& l) const {
 //     if ( beg1 == l.beg1 ) { return end0 < l.end0; }
-//     else return beg1 < l.beg1;    
+//     else return beg1 < l.beg1;
 //   }
 
 //   // compare between genomeLocus
@@ -55,7 +56,7 @@
 //   inline bool operator== (const posLocus& l) const {
 //     return ( ( beg1 == l.beg1 ) && ( end0 == l.end0 ) );
 //   }
-  
+
 //   // returns length of the interval
 //   int32_t length() const { return end0-beg1+1; }
 
@@ -64,7 +65,7 @@
 //     if ( ( beg1 <= end0 ) && ( _beg1 <= end0 ) ) {
 //       return ( _beg1 < end0 ? _beg1 : end0 ) - ( beg1 < end0 ? end0 : beg1 ) + 1;
 //     }
-//     else return 0;    
+//     else return 0;
 //   }
 
 //   int32_t overlapBases(const posLocus& l) const {
@@ -74,7 +75,7 @@
 //   bool overlaps(int32_t _beg1, int32_t _end0) const {
 //     if ( ( beg1 <= _end0 )  && ( _beg1 <= end0 ) )
 //       return true;
-//     else 
+//     else
 //       return false;
 //   }
 
@@ -100,10 +101,10 @@
 //     return ( ( pos1 >= beg1 ) && ( pos1 <= end0 ) );
 //   }
 
-//   // check whether the interval contains a particular position in 0-based coordinate  
+//   // check whether the interval contains a particular position in 0-based coordinate
 //   bool contains0(int32_t pos0) const { return contains1(pos0+1); }
 
-//   // parse a string in [chr]:[beg1]-[end0] format 
+//   // parse a string in [chr]:[beg1]-[end0] format
 //   static bool parseRegion(const char* region, std::string& chrom, int32_t& beg1, int32_t& end0) {
 //     char buf[255];
 //     strcpy(buf,region);
@@ -121,13 +122,13 @@
 //     return true;
 //   }
 
-//   // parse a string in [chr]:[beg1]-[end0] format 
+//   // parse a string in [chr]:[beg1]-[end0] format
 //   static bool parseBegLenStrand(const char* region, std::string& chrom, int32_t& beg1, int32_t& end0, bool& fwdStrand) {
 //     char buf[255];
 //     strcpy(buf,region);
 //     const char* pcolon1 = strchr(region,':');
 //     const char* pcolon2 = strchr(pcolon1+1,':');
-//     const char* pcolon3 = strchr(pcolon2+1,':');    
+//     const char* pcolon3 = strchr(pcolon2+1,':');
 //     if ( pcolon1 == NULL )
 //       error("Cannot parse %s in genomeLocus::genomeLocus()");
 //     chrom.assign(region,0,pcolon1-region);
@@ -135,7 +136,7 @@
 //     end0 = beg1 + atoi(pcolon2+1) - 1;
 //     fwdStrand = ((pcolon3 != NULL) && (pcolon3[1] == '-')) ? false : true;
 //     return true;
-//   }  
+//   }
 // };
 
 class gtfGene;
@@ -158,13 +159,13 @@ class gtfEntryParser {
 public:
   std::map<std::string,std::string> dict;
   std::string empty;
-  
+
   std::string get(const char* key) {
     std::map<std::string,std::string>::iterator it = dict.find(key);
     if ( it != dict.end() ) { return it->second; }
     else { return empty; }
   }
-  
+
   gtfEntryParser(const char* s) {
     const char* p = s;  // cursor
     const char* c = p;  // beginning of item
@@ -192,7 +193,7 @@ public:
 	key.assign(c, n);
 	c = p+1; // set the start of next item
 	while ( ( *c != '\0' ) && ( *c == space ) ) ++c; // consume whitespaces
-	p = c; // update p	
+	p = c; // update p
       }
       else {
 	++p;  // advance
@@ -202,8 +203,8 @@ public:
 };
 
 struct gtfComp {
-  template<typename T>  
-  bool operator()(const T* lhs, const T* rhs) const {  
+  template<typename T>
+  bool operator()(const T* lhs, const T* rhs) const {
     if ( lhs->locus == rhs->locus ) {
       return ((int64_t)rhs - (int64_t)lhs > 0);
     }
@@ -216,7 +217,7 @@ public:
   uint8_t frame;
   gtfCDS(int32_t _start, int32_t _end, const char* sframe, gtfElement* _parent);
 
-  //virtual void printElement();  
+  //virtual void printElement();
 };
 
 class gtfGene : public gtfElement {
@@ -230,7 +231,7 @@ public:
 
   gtfGene(const char* _seqname, int32_t _start, int32_t _end, bool _fwdStrand, std::string& _gid, std::string& _gname, std::string& _gtype);
 
-  //virtual void printElement();  
+  //virtual void printElement();
 };
 
 class gtfTranscript : public gtfElement {
@@ -241,11 +242,11 @@ public:
   std::set<gtfCDS*,    gtfComp> CDSs;
   std::set<gtfElement*,gtfComp> UTRs;
   std::set<gtfElement*,gtfComp> start_codons;
-  std::set<gtfElement*,gtfComp> stop_codons;    
+  std::set<gtfElement*,gtfComp> stop_codons;
 
   gtfTranscript(int32_t _start, int32_t _end, std::string& _tid, std::string& _ttype, gtfElement* _parent);
 
-  //virtual void printElement();  
+  //virtual void printElement();
 };
 
 // An object that represent a GTF file
@@ -268,14 +269,14 @@ public:
   std::map<std::string, gtf_chr_t > mmap;
 
   typedef gtfIntervalTree<int32_t,gtfElement*> gtf_ivt_t;
-  //typedef gtfInterval<int32_t,gtfElement*> gtf_iv_t;  
+  //typedef gtfInterval<int32_t,gtfElement*> gtf_iv_t;
   std::map<std::string, gtf_ivt_t> chr2ivt;
-  
+
   std::map<std::string, gtfGene*> gid2Gene;
   std::map<std::string, gtfTranscript*> tid2Transcript;
   std::map<std::string, gtfGene*> tid2Gene;
 
-  typedef std::multimap<posLocus, gtfElement*>::iterator gtf_elem_it_t;  
+  typedef std::multimap<posLocus, gtfElement*>::iterator gtf_elem_it_t;
 
   gtf_chr_it_t   curChrIt;
   gtf_elem_it_t  curElemIt;
@@ -285,37 +286,37 @@ public:
   bool isend() const;
 
   bool addGene(const char* seqname, int32_t start, int32_t end,
-	       const char* strand, 
+	       const char* strand,
 	       std::string& gid, std::string& gname, std::string& gtype);
 
   bool addTranscript(const char* seqname, int32_t start, int32_t end,
-	       const char* strand, 
+	       const char* strand,
 	       std::string& gid, std::string& tid, std::string& ttype);
 
   bool addExon(const char* seqname, int32_t start, int32_t end,
-	       const char* strand,  
+	       const char* strand,
 	       std::string& tid);
 
   bool addUTR(const char* seqname, int32_t start, int32_t end,
-	      const char* strand, 
+	      const char* strand,
 	       std::string& tid);
 
   bool addCDS(const char* seqname, int32_t start, int32_t end,
 	       const char* strand, const char* frame,
-	       std::string& tid);    
+	       std::string& tid);
 
   bool addStartCodon(const char* seqname, int32_t start, int32_t end,
 	       const char* strand,
 	       std::string& tid);
 
   bool addStopCodon(const char* seqname, int32_t start, int32_t end,
-	       const char* strand, 
+	       const char* strand,
 	       std::string& tid);
 
   bool checkTranscriptSanity(std::string& tid, const char* seqname, const char* strand);
 
   int32_t findOverlappingElements(const char* seqname, int32_t start, int32_t end, std::set<gtfElement*>& results);
-  int32_t findOverlappingElements(const char* seqname, int32_t start, int32_t end, bool fwdStrand, std::set<gtfElement*>& results);  
+  int32_t findOverlappingElements(const char* seqname, int32_t start, int32_t end, bool fwdStrand, std::set<gtfElement*>& results);
 };
 
 #endif

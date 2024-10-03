@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <cstdint>
 
 class dataframe_t {
 public:
@@ -18,15 +19,15 @@ public:
   inline const std::string& get_str_elem(int32_t row, int32_t col) {
     return columns[col][row];
   }
-  
+
   inline int32_t get_int_elem(int32_t row, int32_t col) {
     return strtol(columns[col][row].c_str(), NULL, 10);
   }
-  
+
   inline int64_t get_int64_elem(int32_t row, int32_t col) {
     return strtoll(columns[col][row].c_str(), NULL, 10);
   }
-  
+
   inline uint64_t get_uint64_elem(int32_t row, int32_t col) {
     return strtoull(columns[col][row].c_str(), NULL, 10);
   }
@@ -38,7 +39,7 @@ public:
   inline std::vector<std::string>& get_column(int32_t col) {
     return columns[col];
   }
-  
+
   inline std::vector<std::string>& get_column(const char* colname) {
     return columns[col2idx[colname]];
   }
@@ -54,15 +55,15 @@ public:
 
   inline const std::string& get_str_elem(int32_t row, const char* colname) {
     return get_column(colname).at(row);
-  }  
-  
+  }
+
   inline int32_t get_int_elem(int32_t row, const char* colname) {
     return strtol(get_column(colname).at(row).c_str(), NULL, 10);
   }
 
   inline int64_t get_int64_elem(int32_t row, const char* colname) {
     return strtoll(get_column(colname).at(row).c_str(), NULL, 10);
-  }  
+  }
 
   inline uint64_t get_uint64_elem(int32_t row, const char* colname) {
     return strtoull(get_column(colname).at(row).c_str(), NULL, 10);

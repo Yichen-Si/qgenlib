@@ -22,6 +22,7 @@
 #include <vector>
 #include <stdexcept>
 #include <limits>
+#include <cstdint>
 
 //extern "C" {
 //  size_t hts_realloc_or_die(unsigned long, unsigned long, unsigned long, unsigned long, int, void**, char const*);
@@ -43,7 +44,7 @@ void catprintf(std::string &s, const char * msg, ...);
 int32_t cat_join_str(std::string& s, std::vector<std::string>& v, const char* delim);
 int32_t cat_join_uint64(std::string& s, std::vector<uint64_t>& v, const char* delim);
 int32_t cat_join_int32(std::string& s, std::vector<int32_t>& v, const char* delim);
-  
+
 extern int32_t globalVerbosityThreshold;
 
 // #ifdef __cplusplus
