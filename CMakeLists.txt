@@ -36,6 +36,7 @@ set(SOURCE_FILES
     tsv_reader.cpp
     commands.cpp
     dataframe.cpp
+    seq_utils.cpp
     qgenlib/dataframe.h
     qgenlib/commands.h
     qgenlib/genome_interval.h
@@ -50,13 +51,14 @@ set(SOURCE_FILES
     qgenlib/params.h
     qgenlib/qgen_constant.h
     qgenlib/qgen_except.h
-    qgenlib/tsv_reader.h)
+    qgenlib/tsv_reader.h
+    qgenlib/seq_utils.h)
 
 ADD_LIBRARY(qgen STATIC ${SOURCE_FILES})
 
 SET(APP_EXE testqgen)
 
-ADD_EXECUTABLE(${APP_EXE} test_qgen.cpp) 
+ADD_EXECUTABLE(${APP_EXE} test_qgen.cpp)
 
 find_library(ZLIB z HINTS /usr/lib/x86_64-linux-gnu/ /usr/lib/ /usr/lib64/)
 if(NOT ZLIB)

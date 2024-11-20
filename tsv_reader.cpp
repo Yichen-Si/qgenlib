@@ -26,14 +26,14 @@
 
 bool tsv_reader::open(const char* filename) {
   this->filename = filename;
-  
+
   htsFormat fmt;
   fmt.category = unknown_category;
   fmt.format = text_format;
   fmt.version.major = fmt.version.minor = -1;
   fmt.compression = no_compression;
   fmt.compression_level = -1;
-  fmt.specific = NULL;  
+  fmt.specific = NULL;
   hp = hts_open_format(filename, "r", &fmt);
   if ( hp == NULL ) {
     return false;
@@ -65,13 +65,14 @@ int32_t tsv_reader::read_line() {
     fields = NULL;
     return 0; // lstr;
   }
+  line.assign(str.s, str.l);
 
   // need to free the previously allocated fields!!
-  if ( fields != NULL ) { free(fields); fields = NULL; }  
+  if ( fields != NULL ) { free(fields); fields = NULL; }
   fields = ksplit(&str, delimiter, &nfields);
 
   //notice("lstr = %d, str = %s, delim = %d", lstr, str.s, delimiter);
-    
+
   ++nlines;
   return nfields;
 }
@@ -92,7 +93,7 @@ bool tsv_reader::jump_to(const char* reg) {
     tbx_itr_destroy(itr);
 
   itr = tbx_itr_querys(tbx, reg);
-  
+
   if ( itr == NULL ) {
     notice("Failed jumping to %s, tbx = %x, itr = %x", reg, tbx, itr);
     return false;
@@ -110,7 +111,7 @@ const char* tsv_reader::str_field_at(int32_t idx) {
 
 int32_t tsv_reader::int_field_at(int32_t idx) {
   if ( idx >= nfields )
-    error("[E:%s:%d %s] Cannot access field at %d >= %d", __FILE__, __LINE__, __FUNCTION__, idx, nfields);    
+    error("[E:%s:%d %s] Cannot access field at %d >= %d", __FILE__, __LINE__, __FUNCTION__, idx, nfields);
   return ( atoi(&str.s[fields[idx]]) );
 }
 
@@ -128,7 +129,7 @@ uint64_t tsv_reader::uint64_field_at(int32_t idx) {
 
 double tsv_reader::double_field_at(int32_t idx) {
   if ( idx >= nfields )
-    error("[E:%s:%d %s] Cannot access field at %d >= %d", __FILE__, __LINE__, __FUNCTION__, idx, nfields);    
+    error("[E:%s:%d %s] Cannot access field at %d >= %d", __FILE__, __LINE__, __FUNCTION__, idx, nfields);
   return ( atof(&str.s[fields[idx]]) );
 }
 
@@ -236,13 +237,13 @@ bool dsv_hdr_reader::read_hdr(std::vector<std::string>& prefixes_match, std::vec
       headers.emplace_back(tlr.buffer);
       tokenize_fields();
 
-      while ( (ignore_chars != NULL) && ( tlr.buffer[fields[0]] != '\0' ) && (strchr(ignore_chars,tlr.buffer[fields[0]]) != NULL) ) 
+      while ( (ignore_chars != NULL) && ( tlr.buffer[fields[0]] != '\0' ) && (strchr(ignore_chars,tlr.buffer[fields[0]]) != NULL) )
         ++fields[0];
 
       for(int32_t i=0; i < nfields; ++i) {
         col2idx[str_field_at(i)] = i;
       }
-      
+
       ret_hdr_line = DSV_NOT_YET_PEEKED;
       return true;
     }
@@ -264,7 +265,7 @@ int32_t dsv_hdr_reader::read_line() {
   }
   else if ( ret_hdr_line == 0 )
     return 0;
-  else if ( ret_hdr_line > 0 ) 
+  else if ( ret_hdr_line > 0 )
     ret_hdr_line = DSV_NOT_YET_PEEKED;
   else {
     fprintf(stderr, "ERROR: ret_hdr_line == %d observed, which should never happen", ret_hdr_line);
@@ -296,6 +297,3 @@ int32_t dsv_hdr_reader::store_to_vector(std::vector<std::string>& v) {
   }
   return nfields;
 }
-    
-  
-    

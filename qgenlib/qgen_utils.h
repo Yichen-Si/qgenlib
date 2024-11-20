@@ -53,6 +53,7 @@ void split(std::vector<std::string>& vec, const char* delims, std::string& str, 
 void split(std::vector<std::string>& vec, const char* delims, const char* str, uint32_t limit=UINT_MAX, bool clear=true, bool collapse=true, bool strip=false);
 
 bool stripstr(const std::string& str, std::string& substr);
+std::string stripstr(const std::string& str);
 
 /**
  * Casts a string into int32.  Returns true if successful.

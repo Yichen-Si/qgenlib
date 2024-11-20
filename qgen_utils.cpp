@@ -58,19 +58,21 @@ void split(std::vector<std::string>& vec, const char *delims, std::string& str, 
 
         if ((isDelim && noTokens<limit-1) || i==lastIndex)
         {
-            if (collapse && token.str()!="")
+            if (token.str()!="")
             {
+                std::string token_str = token.str();
                 if (strip) {
-                    std::string substr;
-                    if (stripstr(token.str(), substr)) {
-                        vec.push_back(substr);
-                        ++noTokens;
-                    }
-                } else {
-                    vec.push_back(token.str());
+                    stripstr(token.str(), token_str);
+                }
+                if (!collapse || token_str!="")
+                {
+                    vec.push_back(token_str);
                     ++noTokens;
                 }
                 token.str("");
+            } else if (!collapse) {
+                vec.push_back("");
+                ++noTokens;
             }
         }
 
@@ -113,19 +115,21 @@ void split(std::vector<std::string>& vec, const char *delims, const char* str, u
 
         if ((isDelim && noTokens<limit-1) || i==lastIndex)
         {
-            if (collapse && token.str()!="")
+            if (token.str()!="")
             {
+                std::string token_str = token.str();
                 if (strip) {
-                    std::string substr;
-                    if (stripstr(token.str(), substr)) {
-                        vec.push_back(substr);
-                        ++noTokens;
-                    }
-                } else {
-                    vec.push_back(token.str());
+                    stripstr(token.str(), token_str);
+                }
+                if (!collapse || token_str!="")
+                {
+                    vec.push_back(token_str);
                     ++noTokens;
                 }
                 token.str("");
+            } else if (!collapse) {
+                vec.push_back("");
+                ++noTokens;
             }
         }
 
@@ -147,6 +151,19 @@ bool stripstr(const std::string& str, std::string& substr) {
     }
     return true;
 };
+
+std::string stripstr(const std::string& str) {
+    std::string substr;
+    size_t start = str.find_first_not_of(" \t\n");
+    if (start != std::string::npos) {
+        substr = str.substr(start);
+    }
+    size_t end = str.find_last_not_of(" \t\n");
+    if (end != std::string::npos) {
+        substr = substr.substr(0, end + 1);
+    }
+    return substr;
+}
 
 /**
  * Casts a string into int32.  Returns true if successful.
